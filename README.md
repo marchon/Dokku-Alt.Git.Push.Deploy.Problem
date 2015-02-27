@@ -1,6 +1,15 @@
 # Dokku-Alt.Git.Push.Deploy.Problem
 Debugging Dokku-alt Git Push Deploy Problem
 
+if you are having the same problem as described below the solution is
+Look for and remove bad entries in the dokku ssh authorized keys file
+
+``bash
+cat /home/dokku/.ssh/authorized_keys
+```
+
+
+
 I wanted to make my public facing server __[a Dokku-alt server]__
 that I could configure sites with
 
@@ -322,3 +331,64 @@ it would appear that the sshcommand bindings around the git push are incorrect.
 
 
 But solving that is a problem for tomorrow.  
+
+
+Debugging the Git Push over SSH
+
+vim ~/.ssh/config
+And add:
+
+Host dokku.lazarusco.in
+     LogLevel DEBUG3
+     User     dokku
+
+
+```bash
+bash-3.2# git push dokku master
+  Counting objects: 378, done.
+  Delta compression using up to 8 threads.
+  Compressing objects: 100% (307/307), done.
+  Writing objects: 100% (378/378), 211.25 KiB | 0 bytes/s, done.
+  Total 378 (delta 42), reused 378 (delta 42)
+  remote: +++ [[ -z /home/dokku ]]
+  remote: +++++ dirname /var/lib/dokku-alt/plugins/acl/verify-command
+  remote: ++++ cd /var/lib/dokku-alt/plugins/acl
+  remote: ++++ pwd
+  remote: +++ CWD=/var/lib/dokku-alt/plugins/acl
+  remote: ++ AUTHORIZED_KEYS=/home/dokku/.ssh/authorized_keys
+  remote: ++ DEPLOY_ALLOWED=DEPLOY_ALLOWED
+  remote: + cat
+  remote: + [[ -z '' ]]
+  remote: ++ id -un
+  remote: + [[ dokku != \r\o\o\t ]]
+  remote: + fail 'Access denied. No user supplied.'
+  remote: + echo 'Access denied. No user supplied.'
+  remote: Access denied. No user supplied.
+  remote: + exit 1
+  To dokku@dokku.lazarusco.in:node-js-sample
+   ! [remote rejected] master -> master (pre-receive hook declined)
+  error: failed to push some refs to 'dokku@dokku.lazarusco.in:node-js-sample'
+```
+
+source "$(dirname $0)/vars"
+
+cat
+
+echo '  [[ -z "$NAME" ]] && [[ $(id -un) != "root" ]] && fail "Access denied. No user supplied." '
+
+
+
+
+
+
+
+
+dokku@Modulo:~$ cat /home/dokku/.ssh/authorized_keys
+
+ssh-rsa
+AAAAB3NzaC1yc2EAAAADAQABAAABAQC9lYDU1bxZaDCRSk7yTZqBvWy1h2vqa9haS3W2OV/16MXnuhip+/qEWDMBxb/PAWjXPDDPpoFYJBCM6C5gmLkvRa1mZsFfRP98cdDZoJHCquQDDon/GqvjQghnRt/RH8dmuMPa4MGLoXjQ4ss4xGUOuWq+OcDrUHt4MjeYoLcQIaXJRwVq9tQWPjfoe4Suv488EesE39fjcefkXCXWMkYZ+kXoYoNfW/KwzPieAGU2PdbM7E8ovWFSufAcQva1cBD69UcjjLpUEc6Nx959A0yI4Zh+iuZbBG2HbeCJMxC042985eo98SlOWLt1As9G3C4Demh8UJnoAMHoGOR1Kael root@Rhondas-MacBook-Pro.local
+
+
+command="FINGERPRINT=0f:44:9b:8d:25:38:de:8a:ba:11:f4:32:79:55:ba:aa NAME=admin `cat /home/dokku/.sshcommand` $SSH_ORIGINAL_COMMAND",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQ2xxZ8t1wku8Ij6KOBklb3VpCLZ+rqJVUsQgWV/VakFTkba5q+S3GLmXWGj/tJwFf4RT5rKfqSZiVhTzJe5SJb05HYZbaOFOa82delv7kSrBBHuU00x3Bnt6vX+5heBKaCEZ3DtY56lHt5GFIBpwPY6X8D2pAlb0Q5BIqy4vQfBDpn8LdBlvX9nRFRS/sIErgpQ2uuL0GDv4kTGlpwVcDhTiQTmiZ8BNmK/1xIBiMEruRwrNl7QuOYyNj+9o66/AeX+ZTD9OmF1g97f61kh8kFiycLfX92pKH6NmcFqX4nI/l0AHf5q+d2edtoiLWgqzMCe4zPJLWP4/6e+j8/TwT your_email@example.com
+
+command="FINGERPRINT=e9:96:ed:cf:eb:fc:53:2b:72:75:0f:7c:cc:ec:5f:3c NAME=admin `cat /home/dokku/.sshcommand` $SSH_ORIGINAL_COMMAND",no-agent-forwarding,no-user-rc,no-X11-forwarding,no-port-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC9lYDU1bxZaDCRSk7yTZqBvWy1h2vqa9haS3W2OV/16MXnuhip+/qEWDMBxb/PAWjXPDDPpoFYJBCM6C5gmLkvRa1mZsFfRP98cdDZoJHCquQDDon/GqvjQghnRt/RH8dmuMPa4MGLoXjQ4ss4xGUOuWq+OcDrUHt4MjeYoLcQIaXJRwVq9tQWPjfoe4Suv488EesE39fjcefkXCXWMkYZ+kXoYoNfW/KwzPieAGU2PdbM7E8ovWFSufAcQva1cBD69UcjjLpUEc6Nx959A0yI4Zh+iuZbBG2HbeCJMxC042985eo98SlOWLt1As9G3C4Demh8UJnoAMHoGOR1Kael root@Rhondas-MacBook-Pro.local
